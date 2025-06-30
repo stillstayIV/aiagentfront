@@ -103,7 +103,7 @@ export default function SearchForm({ type }: SearchProps) {
               <h3 className="text-lg font-medium mb-4 text-gray-300">
                 Results
               </h3>
-              <div className="scrollable-content scrollbar-hide max-h-96">
+              <div className="scrollable-content no-scrollbar max-h-96">
                 <ul className="space-y-4">
                   {results.map((result, index) => (
                     <li key={index} className="py-4">

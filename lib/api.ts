@@ -1,8 +1,8 @@
 import axios from "axios";
 
-// Create an axios instance with default config
-const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || "",
+// Create an axios instance for internal API routes
+const internalApi = axios.create({
+  baseURL: "", // Use relative URLs for same-origin requests
   headers: {
     "Content-Type": "application/json",
   },
@@ -18,10 +18,43 @@ export interface AiData {
 
 // API functions
 export const apiService = {
+  // Health check for backend connection
+  async checkHealth(): Promise<{
+    status: string;
+    backend: string;
+    timestamp: string;
+  }> {
+    try {
+      const response = await internalApi.get("/api/health");
+      return response.data;
+    } catch (error: unknown) {
+      console.error("Health check failed:", error);
+
+      // If we get a 503, the health endpoint is working but backend is down
+      if (
+        axios.isAxiosError(error) &&
+        error.response &&
+        error.response.status === 503
+      ) {
+        return error.response.data; // Return the structured error response
+      }
+
+      // For other errors, return a generic error response
+      return {
+        status: "error",
+        backend: process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000",
+        timestamp: new Date().toISOString(),
+      };
+    }
+  },
+
   // Store new data
   async storeData(content: string, context: string): Promise<string> {
     try {
-      const response = await api.post("/api/data", { content, context });
+      const response = await internalApi.post("/api/data", {
+        content,
+        context,
+      });
       return response.data.id;
     } catch (error) {
       console.error("Error storing data:", error);
@@ -32,10 +65,11 @@ export const apiService = {
   // Search by similarity
   async searchSimilar(query: string, limit: number = 5): Promise<string[]> {
     try {
-      const response = await api.get("/api/search/similar", {
-        params: { query, limit },
+      const response = await internalApi.post("/api/search/similar", {
+        query,
+        limit,
       });
-      return response.data;
+      return response.data.results || response.data;
     } catch (error) {
       console.error("Error searching by similarity:", error);
       return [];
@@ -45,10 +79,11 @@ export const apiService = {
   // Search by text
   async searchByText(query: string, limit: number = 5): Promise<string[]> {
     try {
-      const response = await api.get("/api/search/text", {
-        params: { query, limit },
+      const response = await internalApi.post("/api/search/text", {
+        query,
+        limit,
       });
-      return response.data;
+      return response.data.results || response.data;
     } catch (error) {
       console.error("Error searching by text:", error);
       return [];
@@ -58,7 +93,7 @@ export const apiService = {
   // Generate text using Typhoon
   async generateText(prompt: string): Promise<string> {
     try {
-      const response = await api.post("/api/generate", { prompt });
+      const response = await internalApi.post("/api/generate", { prompt });
       return response.data.text;
     } catch (error) {
       console.error("Error generating text:", error);

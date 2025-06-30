@@ -96,7 +96,7 @@ export default function HistoryForm() {
             <h3 className="text-lg font-medium text-purple-200 mb-3">
               Recent Generations ({history.length})
             </h3>
-            <div className="max-h-96 overflow-y-auto space-y-2 scrollbar-hide">
+            <div className="max-h-96 overflow-y-auto space-y-2 no-scrollbar">
               {history.map((item) => (
                 <div
                   key={item.id}
@@ -163,7 +163,7 @@ export default function HistoryForm() {
                     <h4 className="text-sm font-medium text-purple-300 mb-2">
                       Generated Response:
                     </h4>
-                    <div className="glass-dark border border-purple-700 p-3 rounded-md text-purple-100 whitespace-pre-wrap max-h-64 overflow-y-auto scrollbar-hide">
+                    <div className="glass-dark border border-purple-700 p-3 rounded-md text-purple-100 whitespace-pre-wrap max-h-64 overflow-y-auto no-scrollbar">
                       {selectedItem.response}
                     </div>
                   </div>

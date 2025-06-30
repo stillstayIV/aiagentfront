@@ -17,13 +17,18 @@ export default function TextGenerationForm() {
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [selectedHistoryItem, setSelectedHistoryItem] =
     useState<HistoryItem | null>(null);
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
+    // Set client flag to prevent hydration mismatch
+    setIsClient(true);
     // Load history from localStorage on component mount
     loadHistory();
   }, []);
 
   const loadHistory = () => {
+    if (typeof window === "undefined") return; // Skip on server-side
+
     const savedHistory = localStorage.getItem("ai-agent-history");
     if (savedHistory) {
       try {
@@ -68,19 +73,21 @@ export default function TextGenerationForm() {
         timestamp: new Date().toISOString(),
       };
 
-      const existingHistory = localStorage.getItem("ai-agent-history");
-      const historyArray = existingHistory ? JSON.parse(existingHistory) : [];
-      historyArray.unshift(historyItem); // Add to beginning of array
+      if (typeof window !== "undefined") {
+        const existingHistory = localStorage.getItem("ai-agent-history");
+        const historyArray = existingHistory ? JSON.parse(existingHistory) : [];
+        historyArray.unshift(historyItem); // Add to beginning of array
 
-      // Keep only last 50 items
-      if (historyArray.length > 50) {
-        historyArray.splice(50);
+        // Keep only last 50 items
+        if (historyArray.length > 50) {
+          historyArray.splice(50);
+        }
+
+        localStorage.setItem("ai-agent-history", JSON.stringify(historyArray));
+
+        // Reload history to update the sidebar
+        loadHistory();
       }
-
-      localStorage.setItem("ai-agent-history", JSON.stringify(historyArray));
-
-      // Reload history to update the sidebar
-      loadHistory();
 
       // Clear the prompt after successful generation
       setPrompt("");
@@ -95,13 +102,17 @@ export default function TextGenerationForm() {
   const clearHistory = () => {
     setHistory([]);
     setSelectedHistoryItem(null);
-    localStorage.removeItem("ai-agent-history");
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("ai-agent-history");
+    }
   };
 
   const deleteHistoryItem = (id: string) => {
     const newHistory = history.filter((item) => item.id !== id);
     setHistory(newHistory);
-    localStorage.setItem("ai-agent-history", JSON.stringify(newHistory));
+    if (typeof window !== "undefined") {
+      localStorage.setItem("ai-agent-history", JSON.stringify(newHistory));
+    }
     if (selectedHistoryItem?.id === id) {
       setSelectedHistoryItem(null);
     }
@@ -118,14 +129,14 @@ export default function TextGenerationForm() {
   };
 
   return (
-    <div className="form-container max-w-7xl mx-auto">
+    <div className="form-container">
       {/* History Sidebar */}
-      <div className="form-sidebar w-history-sidebar glass-purple shadow-2xl rounded-lg p-4">
-        <div className="flex items-center justify-between mb-4">
+      <div className="form-sidebar glass-purple shadow-2xl rounded-lg p-3">
+        <div className="flex items-center justify-between mb-3 flex-shrink-0">
           <h3 className="text-lg font-semibold text-purple-200 flex items-center">
             <FaHistory className="mr-2 text-purple-400" /> History
           </h3>
-          {history.length > 0 && (
+          {isClient && history.length > 0 && (
             <button
               onClick={clearHistory}
               className="btn-delete-sm flex items-center justify-center"
@@ -142,28 +153,30 @@ export default function TextGenerationForm() {
           )}
         </div>
 
-        {history.length === 0 ? (
-          <div className="text-center py-8">
-            <FaHistory className="mx-auto text-4xl text-purple-600 mb-2" />
-            <p className="text-purple-300 text-sm">No history yet</p>
+        {!isClient || history.length === 0 ? (
+          <div className="text-center py-6 flex-shrink-0">
+            <FaHistory className="mx-auto text-3xl text-purple-600 mb-2" />
+            <p className="text-purple-300 text-sm">
+              {!isClient ? "Loading..." : "No history yet"}
+            </p>
           </div>
         ) : (
-          <div className="flex-1 overflow-y-auto space-y-2 scrollbar-hide">
+          <div className="flex-1 space-y-2 no-scrollbar min-h-0 overflow-y-auto history-scroll">
             {history.map((item) => (
               <div
                 key={item.id}
                 onClick={() => loadHistoryItem(item)}
-                className={`p-3 rounded-lg cursor-pointer transition-all duration-200 border ${
+                className={`p-2 rounded-lg cursor-pointer transition-all duration-200 ${
                   selectedHistoryItem?.id === item.id
-                    ? "glass-purple border-purple-400 shadow-lg"
-                    : "glass-dark border-purple-700 hover:glass-purple hover:border-purple-500"
+                    ? "glass-purple shadow-lg"
+                    : "glass-dark hover:glass-purple"
                 }`}
               >
                 <div className="flex items-start justify-between">
                   <div className="flex-1 min-w-0">
-                    <p className="text-purple-100 text-sm truncate">
-                      {item.prompt.slice(0, 60)}
-                      {item.prompt.length > 60 ? "..." : ""}
+                    <p className="text-purple-100 text-xs truncate">
+                      {item.prompt.slice(0, 50)}
+                      {item.prompt.length > 50 ? "..." : ""}
                     </p>
                     <div className="flex items-center mt-1 text-purple-300 text-xs">
                       <FaClock className="mr-1" />
@@ -175,7 +188,7 @@ export default function TextGenerationForm() {
                       e.stopPropagation();
                       deleteHistoryItem(item.id);
                     }}
-                    className="btn-delete-sm flex items-center justify-center ml-2"
+                    className="btn-delete-sm flex items-center justify-center ml-1"
                   >
                     <svg
                       className="w-3 h-3"
@@ -197,49 +210,80 @@ export default function TextGenerationForm() {
       </div>
 
       {/* Main Text Generation Form */}
-      <div className="form-main glass-purple shadow-2xl rounded-lg p-6 flex flex-col h-full">
-        <h2 className="text-xl font-semibold mb-4 text-purple-200 flex items-center">
+      <div className="form-main glass-purple shadow-2xl rounded-lg p-4 flex flex-col">
+        <h2 className="text-xl font-semibold mb-3 text-purple-200 flex items-center">
           <FaRobot className="mr-2 text-purple-400" /> AI Text Generation
         </h2>
 
         {error && (
-          <div className="mb-4 p-3 glass-dark border border-red-700 text-red-300 rounded">
+          <div className="mb-3 p-3 glass-dark border border-red-700 text-red-300 rounded">
             {error}
           </div>
         )}
 
+        {/* Content Display Area */}
+        {!generatedText && !isLoading && (
+          <div className="mb-4 flex flex-col flex-1 content-display">
+            <div className="glass-dark p-4 rounded-md text-purple-300 flex items-center justify-center flex-1">
+              <div className="text-center">
+                <FaRobot className="mx-auto text-4xl text-purple-600 mb-4" />
+                <p className="text-lg mb-2">
+                  พิมพ์คำถามและกด Enter เพื่อเริ่มสร้างข้อความ
+                </p>
+                <p className="text-sm text-purple-400">
+                  AI จะตอบคำถามและแสดงผลแบบเต็มที่นี่
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {generatedText && (
-          <div className="flex-1 min-h-0 mb-2">
-            {/* <h3 className="text-lg font-medium mb-2 text-purple-200">
-              Generated Text:
-            </h3> */}
-            <div className="glass-dark border border-purple-700 p-4 rounded-md text-purple-100 whitespace-pre-wrap h-full overflow-y-auto scrollbar-hide">
+          <div className="mb-4 flex flex-col flex-1 content-display">
+            <div
+              className="glass-dark p-4 rounded-md text-purple-100 whitespace-pre-wrap generated-text-area scroll-smooth-hidden text-wrap-balance"
+              style={{
+                maxHeight: "calc(100vh - 450px)",
+                minHeight: "200px",
+              }}
+            >
               {generatedText}
+              {/* Debug info */}
+              <div className="text-xs text-purple-400 mt-4 pt-3 border-t border-purple-700 border-opacity-20">
+                ความยาว: {generatedText.length} ตัวอักษร | เวลา:{" "}
+                {new Date().toLocaleTimeString()}
+              </div>
             </div>
           </div>
         )}
 
         {isLoading && (
-          <div className="flex-1 flex items-center justify-center mb-2">
+          <div
+            className="mb-4 flex items-center justify-center flex-1"
+            style={{ minHeight: "400px" }}
+          >
             <div className="text-center">
-              <div className="text-purple-400 text-lg font-medium">
-                Generating...
+              <div className="text-purple-400 text-xl font-medium flex items-center justify-center gap-3 mb-4">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-400"></div>
+                กำลังสร้างคำตอบ...
               </div>
-              <div className="text-purple-300 text-sm mt-1">
-                Please wait while AI processes your request
+              <div className="text-purple-300 text-sm">
+                💡 กด{" "}
+                <kbd className="px-2 py-1 bg-purple-800 rounded text-xs">
+                  Enter
+                </kbd>{" "}
+                เพื่อส่งคำถาม หรือ{" "}
+                <kbd className="px-2 py-1 bg-purple-800 rounded text-xs">
+                  Shift+Enter
+                </kbd>{" "}
+                เพื่อขึ้นบรรทัดใหม่
               </div>
             </div>
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="flex flex-col mt-auto">
+        <form onSubmit={handleSubmit} className="flex-shrink-0 mt-auto pt-3">
           <div className="mb-2">
-            <label
-              htmlFor="prompt"
-              className="block mb-1 text-sm font-medium text-purple-300"
-            >
-              {/* Prompt label removed */}
-            </label>
             <textarea
               id="prompt"
               value={prompt}
@@ -248,18 +292,49 @@ export default function TextGenerationForm() {
                 if (e.key === "Enter" && !e.shiftKey) {
                   e.preventDefault();
                   if (!isLoading && prompt.trim()) {
-                    const formEvent = {
+                    // Create a synthetic form event for submission
+                    const syntheticEvent = {
                       preventDefault: () => {},
-                    } as React.FormEvent;
-                    handleSubmit(formEvent);
+                      target: e.target,
+                    } as React.FormEvent<HTMLFormElement>;
+                    handleSubmit(syntheticEvent);
                   }
                 }
+                // Allow Shift+Enter for new line (default behavior)
               }}
-              className="input-dark w-full px-3 py-2 resize-none"
+              className="w-full px-4 py-3 bg-black bg-opacity-60 border border-purple-600 rounded-lg text-white placeholder-purple-300 focus:outline-none focus:border-purple-400 focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50 resize-y min-h-24 max-h-32 no-scrollbar textarea-no-wrap"
+              style={{
+                wordWrap: "break-word",
+                whiteSpace: "pre-wrap",
+                overflowWrap: "break-word",
+                lineHeight: "1.5",
+              }}
               rows={3}
-              placeholder="Enter your prompt for the AI... (Press Enter to generate, Shift+Enter for new line)"
+              placeholder="พิมพ์คำถามของคุณที่นี่..."
               disabled={isLoading}
             />
+            <div className="text-xs text-purple-400 mt-1 flex items-center gap-1">
+              <span>💡</span>
+              <span>
+                กด{" "}
+                <kbd className="px-1 py-0.5 bg-purple-800 rounded text-xs">
+                  Enter
+                </kbd>{" "}
+                เพื่อส่ง หรือ{" "}
+                <kbd className="px-1 py-0.5 bg-purple-800 rounded text-xs">
+                  Shift+Enter
+                </kbd>{" "}
+                เพื่อขึ้นบรรทัดใหม่
+              </span>
+            </div>
+            {/* Hidden submit button for form submission */}
+            <button
+              type="submit"
+              className="hidden"
+              disabled={isLoading || !prompt.trim()}
+            >
+              Submit
+            </button>
           </div>
         </form>
       </div>

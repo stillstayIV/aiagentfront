@@ -49,6 +49,20 @@
     border: 1px solid rgba(124, 58, 237, 0.3);
   }
 
+  /* Animation utilities */
+  .animate-spin {
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
   .btn-gradient {
     background: linear-gradient(to right, #9333ea, #2563eb);
     color: white;
@@ -85,10 +99,61 @@
     color: rgba(156, 163, 175, 1);
   }
 
-  .input-dark:focus {
-    outline: none;
-    box-shadow: 0 0 0 2px #9333ea;
-    border-color: #9333ea;
+  /* Textarea specific styling to prevent word breaking */
+  textarea {
+    word-wrap: break-word;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+    line-height: 1.5;
+    resize: vertical;
+  }
+
+  textarea.input-dark {
+    word-wrap: break-word;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+  }
+
+  /* Custom textarea class to prevent word cutting */
+  .textarea-no-wrap {
+    word-wrap: break-word !important;
+    white-space: pre-wrap !important;
+    overflow-wrap: break-word !important;
+    word-break: normal !important;
+    line-height: 1.5 !important;
+  }
+
+  /* Generated text display area */
+  .generated-text-area {
+    word-wrap: break-word !important;
+    white-space: pre-wrap !important;
+    overflow-wrap: break-word !important;
+    word-break: normal !important;
+    line-height: 1.6 !important;
+    padding-bottom: 3rem !important;
+    height: auto !important;
+    overflow: visible !important;
+    /* Hide scrollbar completely */
+    -ms-overflow-style: none !important;
+    scrollbar-width: none !important;
+  }
+
+  .generated-text-area::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  /* Ensure content is fully visible */
+  .content-display {
+    overflow: visible !important;
+    height: auto !important;
+    min-height: 400px !important;
+    /* Hide scrollbar completely */
+    -ms-overflow-style: none !important;
+    scrollbar-width: none !important;
+  }
+
+  .content-display::-webkit-scrollbar {
+    display: none !important;
   }
 
   /* Delete button styles to match theme */
@@ -129,6 +194,28 @@
     color: #f87171 !important;
     box-shadow: 0 0 8px rgba(220, 38, 38, 0.3) !important;
     transform: scale(1.1) !important;
+  }
+
+  /* Utility class for smooth scrolling with hidden scrollbar */
+  .scroll-smooth-hidden {
+    overflow-y: auto !important;
+    scroll-behavior: smooth !important;
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+  }
+
+  .scroll-smooth-hidden::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+  }
+
+  /* Text wrapping utilities for long content */
+  .text-wrap-balance {
+    text-wrap: balance;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
   }
 }
 
@@ -266,8 +353,14 @@
 .w-full {
   width: 100%;
 }
+.w-5 {
+  width: 1.25rem;
+}
 .w-6 {
   width: 1.5rem;
+}
+.h-5 {
+  height: 1.25rem;
 }
 .h-6 {
   height: 1.5rem;
@@ -367,6 +460,10 @@
 }
 
 /* Text sizing */
+.text-xs {
+  font-size: 0.75rem;
+  line-height: 1rem;
+}
 .text-sm {
   font-size: 0.875rem;
   line-height: 1.25rem;
@@ -400,6 +497,13 @@
 }
 .border-b {
   border-bottom-width: 1px;
+}
+.border-b-2 {
+  border-bottom-width: 2px;
+}
+
+.rounded-full {
+  border-radius: 9999px;
 }
 
 .list-inside {
@@ -511,10 +615,47 @@
   color: rgba(156, 163, 175, 1);
 }
 
-.input-dark:focus {
-  outline: none;
-  box-shadow: 0 0 0 2px #9333ea;
-  border-color: #9333ea;
+/* Textarea specific styling to prevent word breaking */
+textarea {
+  word-wrap: break-word;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  line-height: 1.5;
+  resize: vertical;
+}
+
+textarea.input-dark {
+  word-wrap: break-word;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+}
+
+/* Custom textarea class to prevent word cutting */
+.textarea-no-wrap {
+  word-wrap: break-word !important;
+  white-space: pre-wrap !important;
+  overflow-wrap: break-word !important;
+  word-break: normal !important;
+  line-height: 1.5 !important;
+}
+
+/* Generated text display area */
+.generated-text-area {
+  word-wrap: break-word !important;
+  white-space: pre-wrap !important;
+  overflow-wrap: break-word !important;
+  word-break: normal !important;
+  line-height: 1.6 !important;
+  padding-bottom: 3rem !important;
+  max-height: none !important;
+  height: auto !important;
+}
+
+/* Ensure content is fully visible */
+.content-display {
+  overflow-y: auto !important;
+  max-height: calc(100vh - 300px) !important;
+  min-height: 400px !important;
 }
 
 /* Responsive utilities */
@@ -546,6 +687,49 @@
   }
   .md\:w-auto {
     width: auto;
+  }
+}
+
+@media (min-width: 1025px) {
+  /* Ensure percentage layout on larger screens */
+  .form-sidebar {
+    width: 20% !important;
+    min-width: 280px !important;
+    max-width: 400px !important;
+  }
+
+  .form-main {
+    width: 75% !important;
+  }
+}
+
+@media (min-width: 1440px) {
+  /* Large desktop optimization */
+  .form-container {
+    gap: 3rem !important;
+  }
+
+  .form-sidebar {
+    width: 18% !important;
+    min-width: 320px !important;
+    max-width: 450px !important;
+  }
+
+  .form-main {
+    width: 77% !important;
+  }
+}
+
+@media (min-width: 1920px) {
+  /* Extra large screens */
+  .form-sidebar {
+    width: 15% !important;
+    min-width: 350px !important;
+    max-width: 500px !important;
+  }
+
+  .form-main {
+    width: 80% !important;
   }
 }
 
@@ -780,234 +964,367 @@
   width: 20rem;
 }
 
-/* Hide scrollbars */
+/* ULTIMATE SCROLLBAR ELIMINATION - NO SCROLLBARS ANYWHERE */
+
+/* Global scrollbar elimination for ALL elements */
+* {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+*::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  background: transparent !important;
+}
+
+/* HTML and Body specific */
+html,
+body {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+  overflow-x: hidden !important;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/* All possible scrollable elements */
+div,
+textarea,
+section,
+article,
+main,
+aside,
+ul,
+ol,
+li,
+span,
+p,
+pre,
+code,
+form,
+fieldset {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+div::-webkit-scrollbar,
+textarea::-webkit-scrollbar,
+section::-webkit-scrollbar,
+article::-webkit-scrollbar,
+main::-webkit-scrollbar,
+aside::-webkit-scrollbar,
+ul::-webkit-scrollbar,
+ol::-webkit-scrollbar,
+li::-webkit-scrollbar,
+span::-webkit-scrollbar,
+p::-webkit-scrollbar,
+pre::-webkit-scrollbar,
+code::-webkit-scrollbar,
+form::-webkit-scrollbar,
+fieldset::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/* Class-based overrides */
+[class*="overflow"],
+[class*="scroll"],
+.no-scrollbar,
 .scrollbar-hide {
-  -ms-overflow-style: none; /* Internet Explorer 10+ */
-  scrollbar-width: none; /* Firefox */
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
 }
+
+[class*="overflow"]::-webkit-scrollbar,
+[class*="scroll"]::-webkit-scrollbar,
+.no-scrollbar::-webkit-scrollbar,
 .scrollbar-hide::-webkit-scrollbar {
-  display: none; /* Safari and Chrome */
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
 }
 
-/* Apply to max-height containers */
-.max-h-96 {
-  max-height: 24rem;
+/* Textarea height utilities */
+.min-h-20 {
+  min-height: 5rem;
 }
 
-/* Custom scrollable area without visible scrollbar */
-.scroll-container {
-  overflow-y: auto;
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-.scroll-container::-webkit-scrollbar {
-  display: none;
+.max-h-40 {
+  max-height: 10rem;
 }
 
-/* Sticky navbar and footer positioning */
-.navbar-sticky {
-  position: sticky;
-  top: 0;
-  z-index: 50;
+.max-h-60 {
+  max-height: 15rem;
 }
 
-.footer-bottom {
-  margin-top: auto;
+/* Additional height utilities */
+.min-h-24 {
+  min-height: 6rem;
 }
 
-/* Ensure proper layout for sticky elements */
+.max-h-48 {
+  max-height: 12rem;
+}
+
+.min-h-32 {
+  min-height: 8rem;
+}
+
+.max-h-32 {
+  max-height: 8rem;
+}
+
+/* No scrollbar anywhere - Ultimate override */
+.form-main,
+.form-sidebar {
+  overflow: visible !important;
+  height: auto !important;
+  max-height: none !important;
+}
+
+.form-container {
+  overflow: visible !important;
+  height: auto !important;
+}
+
+/* Remove any height restrictions */
+.content-display,
+.generated-text-area {
+  overflow: visible !important;
+  height: auto !important;
+  max-height: none !important;
+}
+
+/* Layout structure classes */
 .layout-container {
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
-  height: 100vh;
-  width: 100%;
-  overflow-x: hidden;
-  max-width: 100vw;
+  overflow: visible;
 }
 
-/* Main content area utilities */
 .main-content {
   flex: 1;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
-  min-height: 0;
-  height: calc(
-    100vh - 120px
-  ); /* Subtract navbar and footer approximate height */
+  overflow: visible;
+  padding: 0;
 }
 
 .content-wrapper {
   flex: 1;
   display: flex;
-  justify-content: center;
-  align-items: stretch;
-  padding: 1rem;
-  overflow: hidden;
-  min-height: 0;
-  height: 100%;
-}
-
-/* Form container adjustments */
-.form-container {
-  width: 100%;
-  max-width: 100%;
-  height: 100%;
-  display: flex;
-  gap: 1.5rem;
-  overflow: hidden;
-}
-
-.form-main {
-  flex: 1;
-  min-height: 0;
-  height: 100%;
-  overflow-y: auto;
-  display: flex;
   flex-direction: column;
+  overflow: visible;
+  max-width: 100%;
+  margin: 0;
 }
 
-.form-sidebar {
+.footer-bottom {
+  margin-top: auto;
   flex-shrink: 0;
-  min-height: 0;
-  height: 100%;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
 }
 
-/* Scrollable content areas */
-.scrollable-content {
-  flex: 1;
-  overflow-y: auto;
-  min-height: 0;
+/* Form container - side by side layout */
+.form-container {
+  display: flex !important;
+  flex-direction: row !important;
+  gap: 2rem !important;
+  height: calc(100vh - 200px) !important;
+  min-height: 600px !important;
+  overflow: visible !important;
+  max-width: 100% !important;
+  width: 100% !important;
+  justify-content: space-between !important;
+  padding: 0 1rem !important;
 }
 
-/* Textarea width adjustment */
-.textarea-reduced {
-  width: calc(100% - 10px);
+/* History sidebar - 20% width on the left */
+.form-sidebar {
+  width: 20% !important;
+  min-width: 250px !important;
+  max-width: 350px !important;
+  height: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: visible !important;
+  flex-shrink: 0 !important;
 }
 
-/* Additional input width utilities */
-.input-reduced {
-  width: calc(100% - 10px);
+/* Main form area - 75% width on the right */
+.form-main {
+  width: 75% !important;
+  height: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: visible !important;
+  min-width: 0 !important;
+  flex-shrink: 0 !important;
 }
 
-/* Responsive utilities for preventing overflow */
-.prevent-overflow {
-  max-width: 100%;
-  overflow-x: hidden;
+/* History scroll area - special case for scrollable content */
+.history-scroll {
+  overflow-y: auto !important;
+  max-height: calc(100vh - 300px) !important;
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
 }
 
-/* Ensure proper spacing and no horizontal overflow */
-@media (max-width: 1280px) {
-  .w-history-sidebar {
-    width: 18rem;
-    min-width: 16rem;
-  }
-}
-
-@media (max-width: 768px) {
-  .w-history-sidebar {
-    width: 16rem;
-    min-width: 14rem;
-  }
+.history-scroll::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
 }
 
 /* Responsive layout adjustments */
-@media (max-width: 1024px) {
-  .form-container {
-    flex-direction: column;
-    gap: 1rem;
-  }
-
+@media (max-width: 1024px) and (min-width: 769px) {
+  /* Tablet landscape - maintain side-by-side but adjust proportions */
   .form-sidebar {
-    width: 100%;
-    max-height: 30vh;
+    width: 25% !important;
+    min-width: 200px !important;
+    max-width: 300px !important;
   }
 
-  .w-history-sidebar {
-    width: 100%;
-    min-width: 100%;
+  .form-main {
+    width: 70% !important;
+  }
+
+  .form-container {
+    gap: 1.5rem !important;
   }
 }
 
 @media (max-width: 768px) {
-  .content-wrapper {
-    padding: 0.5rem;
-  }
-
+  /* Mobile and tablet portrait - stack vertically */
   .form-container {
-    gap: 0.75rem;
+    flex-direction: column !important;
+    height: auto !important;
+    gap: 1rem !important;
   }
 
   .form-sidebar {
-    max-height: 25vh;
+    width: 100% !important;
+    min-width: auto !important;
+    max-width: none !important;
+    height: auto !important;
+    max-height: 250px !important;
+  }
+
+  .history-scroll {
+    max-height: 150px !important;
+  }
+
+  .form-main {
+    width: 100% !important;
+    height: auto !important;
+    min-height: 500px !important;
+  }
+
+  .main-content {
+    padding: 0 !important;
+  }
+
+  .form-container {
+    gap: 0.75rem !important;
+    padding: 0 0.5rem !important;
+  }
+
+  /* Adjust generated text area for mobile */
+  .generated-text-area {
+    max-height: calc(100vh - 350px) !important;
+    min-height: 150px !important;
   }
 }
 
-/* Large screen adjustments */
+@media (min-width: 1025px) {
+  /* Ensure percentage layout on larger screens */
+  .form-sidebar {
+    width: 20% !important;
+    min-width: 280px !important;
+    max-width: 400px !important;
+  }
+
+  .form-main {
+    width: 75% !important;
+  }
+}
+
 @media (min-width: 1440px) {
-  .content-wrapper {
-    padding: 2rem;
-  }
-
+  /* Large desktop optimization */
   .form-container {
-    gap: 2rem;
-  }
-
-  .w-history-sidebar {
-    width: 24rem;
-    min-width: 24rem;
-    max-width: 28rem;
-  }
-}
-
-/* Ultra-wide screen adjustments */
-@media (min-width: 1920px) {
-  .content-wrapper {
-    padding: 3rem;
-  }
-
-  .form-container {
-    gap: 2.5rem;
-    max-width: 90vw;
-    margin: 0 auto;
-  }
-
-  .w-history-sidebar {
-    width: 26rem;
-    min-width: 26rem;
-    max-width: 30rem;
-  }
-}
-
-/* Small screen adjustments */
-@media (max-width: 480px) {
-  .content-wrapper {
-    padding: 0.25rem;
-  }
-
-  .form-container {
-    gap: 0.5rem;
+    gap: 3rem !important;
   }
 
   .form-sidebar {
-    max-height: 20vh;
+    width: 18% !important;
+    min-width: 320px !important;
+    max-width: 450px !important;
   }
 
-  .glass-purple,
-  .glass-dark {
-    padding: 1rem;
+  .form-main {
+    width: 77% !important;
   }
 }
 
-/* Z-index utilities */
-.z-50 {
-  z-index: 50;
+@media (min-width: 1920px) {
+  /* Extra large screens */
+  .form-sidebar {
+    width: 15% !important;
+    min-width: 350px !important;
+    max-width: 500px !important;
+  }
+
+  .form-main {
+    width: 80% !important;
+  }
 }
 
-.z-40 {
-  z-index: 40;
+/* Generated text with hidden scrollbar */
+.generated-text-area {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+.generated-text-area::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/* Content display with hidden scrollbar */
+.content-display {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+.content-display::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/* Ensure all scrollable areas have hidden scrollbars */
+.overflow-y-auto,
+.overflow-auto,
+[style*="overflow-y: auto"],
+[style*="overflow: auto"] {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+.overflow-y-auto::-webkit-scrollbar,
+.overflow-auto::-webkit-scrollbar,
+[style*="overflow-y: auto"]::-webkit-scrollbar,
+[style*="overflow: auto"]::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
 }
